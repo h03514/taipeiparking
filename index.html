@@ -7,18 +7,115 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
     <script src="js/TCMSV_alldesc.js"></script>
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js'></script>
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/3.0.2/vue.global.js'></script>
+    <!-- <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js'></script> -->
+    <!-- <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/3.0.2/vue.global.js'></script> -->
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.3/css/bootstrap.min.css' />
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/index.css">
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.0/axios.min.js'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.9/vue.js'></script>
 
 
 </head>
 
 <body>
-    <div id="taipeiParking">
+    <div id="taipeiParking" class="container">
+        <div class="row">
+
+            <div class="col-sm-6" v-for="item in filterData">
+                <h4>{{item.storeNm}}</h4>
+
+                <li>地址 : {{item.addr}}</li>
+                <li>TEL：{{item.tel}}</li>
+                <li>營業時間：{{item.busiTime}}</li>
+                <br>
+                <pre>
+                    {{item}}
+                </pre>
+            </div>
+
+        </div>
+
+
+    </div>
+
+    <div id="emit-example-argument">
 
     </div>
     <script>
-        console.log(tparking);
+        let app = new Vue({
+            el: '#taipeiParking',
+            data: {
+                text: 'dddd',
+                data: [],
+                locations: []
+            },
+            created() {
+                const vm = this;
+
+                axios.get('https://3000.gov.tw/hpgapi-openmap/api/getPostData').then((res) => {
+                    this.data = res.data;
+                    vm.getLocation();
+                }).catch(function(err) {
+                    console.log(err);
+                })
+            },
+            methods: {
+                getLocation() {
+                    const locations = new Set();
+                    const vm = this;
+                    vm.data.forEach((item, i) => {
+                        console.log(item);
+                    })
+                }
+            },
+            computed: {
+                filterData() {
+                    const vm = this;
+                    let items = [];
+                    if (vm.locations) {
+                        items = vm.data.filter((item, i) => {
+                            return item.hsnNm == vm.locations;
+                        });
+                    }
+
+
+                    vm.data.forEach((item) => {
+                        if (item.hsnNm == '臺北市') {
+                            return false;
+                        }
+
+                    });
+                    return vm.data
+                }
+            }
+        })
+
+
+        // const app = Vue.createApp({
+        //     methods: {
+        //         showAdvice(advice) {
+        //             alert(advice)
+        //         }
+        //     }
+        // })
+
+        //         app.component('advice-component', {
+        //             data() {
+        //                 return {
+        //                     adviceText: 'Some advice'
+        //                 }
+        //             },
+        //             template: `
+        //     <div>
+        //       <input type="text" v-model="adviceText">
+        //       <button v-on:click="$emit('give-advice', adviceText)">
+        //         Click me for sending advice
+        //       </button>
+        //     </div>
+        //   `
+        //         })
+        //         app.mount('#emit-example-argument');
     </script>
 </body>
 
