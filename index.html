@@ -20,18 +20,30 @@
 
 <body>
     <div id="taipeiParking" class="container">
+        <div id="sel">
+            <select name="" class="form-control" v-model="">
+                <option value="">-- 全部 --</option>
+                <option :value="item" v-for="item in locations">{{item}}</option>
+            </select>
+        </div>
         <div class="row">
-
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item" v-for="page in filterData.leng">
+                        <a class="page-link" href="">{{page}}</a>
+                    </li>
+                </ul>
+            </nav>
             <div class="col-sm-6" v-for="item in filterData">
-                <h4>{{item.storeNm}}</h4>
-
-                <li>地址 : {{item.addr}}</li>
-                <li>TEL：{{item.tel}}</li>
-                <li>營業時間：{{item.busiTime}}</li>
+                <h4>{{item.name}}</h4>
+                <li>區別 : {{item.area}}</li>
+                <li>地址 : {{item.address}}</li>
+                <li>計時：{{item.payex}}</li>
+                <li>營業時間：{{item.serviceTime}}</li>
                 <br>
-                <pre>
+                <!-- <pre>
                     {{item}}
-                </pre>
+                </pre> -->
             </div>
 
         </div>
@@ -39,83 +51,78 @@
 
     </div>
 
-    <div id="emit-example-argument">
-
-    </div>
     <script>
         let app = new Vue({
             el: '#taipeiParking',
             data: {
                 text: 'dddd',
                 data: [],
-                locations: []
+                locations: [],
+                tpPark: [],
+                currentLocations: '',
+                current: 'fff'
+
             },
             created() {
                 const vm = this;
+                let items = [];
+                for (let i in tparking.data.park) {
+                    items.push(tparking.data.park[i]);
+                }
+                vm.locations = items;
+                vm.getUniqueList();
+                vm.getLocation();
 
-                axios.get('https://3000.gov.tw/hpgapi-openmap/api/getPostData').then((res) => {
-                    this.data = res.data;
-                    vm.getLocation();
-                }).catch(function(err) {
-                    console.log(err);
-                })
             },
             methods: {
+                getUniqueList() {
+                    const locations = new Set();
+
+                    const vm = this;
+                    vm.locations.forEach((item, i) => {
+                        locations.add(item.area);
+                    });
+                    vm.locations = Array.from(locations);
+                },
                 getLocation() {
                     const locations = new Set();
+
                     const vm = this;
-                    vm.data.forEach((item, i) => {
-                        console.log(item);
-                    })
+
+                    for (let i in tparking) {
+                        tparking[i].park.forEach((item) => {
+                            vm.tpPark.push(item);
+                        });
+                    }
                 }
             },
             computed: {
                 filterData() {
                     const vm = this;
                     let items = [];
-                    if (vm.locations) {
-                        items = vm.data.filter((item, i) => {
-                            return item.hsnNm == vm.locations;
+                    if (vm.currentLocation) {
+                        items = vm.tpPark.filter((item, i) => {
+                            // console.log(item);
                         });
+                    } else {
+                        items = vm.tpPark;
                     }
-
-
-                    vm.data.forEach((item) => {
-                        if (item.hsnNm == '臺北市') {
-                            return false;
+                    // vm.tpPark.filter((item, i) => {
+                    //     return item.name == vm.locations;
+                    // });
+                    // return vm.tpPark;
+                    const newData = [];
+                    vm.tpPark.forEach((item, i) => {
+                        if (i % 10 == 0) {
+                            newData.push([]);
                         }
-
-                    });
-                    return vm.data
+                        const page = parseInt(i / 10);
+                        newData[page].push(item);
+                    })
+                    return vm.tpPark;
                 }
             }
         })
-
-
-        // const app = Vue.createApp({
-        //     methods: {
-        //         showAdvice(advice) {
-        //             alert(advice)
-        //         }
-        //     }
-        // })
-
-        //         app.component('advice-component', {
-        //             data() {
-        //                 return {
-        //                     adviceText: 'Some advice'
-        //                 }
-        //             },
-        //             template: `
-        //     <div>
-        //       <input type="text" v-model="adviceText">
-        //       <button v-on:click="$emit('give-advice', adviceText)">
-        //         Click me for sending advice
-        //       </button>
-        //     </div>
-        //   `
-        //         })
-        //         app.mount('#emit-example-argument');
     </script>
 </body>
 
