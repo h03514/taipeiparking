@@ -21,7 +21,7 @@
 <body>
     <div id="taipeiParking" class="container">
         <div id="sel">
-            <select name="" class="form-control" v-model="">
+            <select name="" class="form-control" v-model="current">
                 <option value="">-- 全部 --</option>
                 <option :value="item" v-for="item in locations">{{item}}</option>
             </select>
@@ -55,13 +55,10 @@
         let app = new Vue({
             el: '#taipeiParking',
             data: {
-                text: 'dddd',
                 data: [],
                 locations: [],
                 tpPark: [],
-                currentLocations: '',
-                current: 'fff'
-
+                current: 'dddd'
             },
             created() {
                 const vm = this;
@@ -99,6 +96,7 @@
             computed: {
                 filterData() {
                     const vm = this;
+                    console.log(vm.current);
                     let items = [];
                     if (vm.currentLocation) {
                         items = vm.tpPark.filter((item, i) => {
