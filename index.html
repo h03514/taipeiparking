@@ -27,14 +27,8 @@
             </select>
         </div>
         <div class="row">
-            <nav aria-label="Page navigation example">
-                <ul class="pagination justify-content-center">
-                    <li class="page-item" v-for="page in filterData.leng">
-                        <a class="page-link" href="">{{page}}</a>
-                    </li>
-                </ul>
-            </nav>
-            <div class="col-sm-6" v-for="item in filterData">
+            <div class="col-sm-6" v-for="item in filterData[currentPage]">
+
                 <h4>{{item.name}}</h4>
                 <li>區別 : {{item.area}}</li>
                 <li>地址 : {{item.address}}</li>
@@ -47,8 +41,23 @@
             </div>
 
         </div>
+        <div>
 
-
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item" class="{{active:currentPage == page-1}}" v-for="page in filterData.length">
+                        <a class="page-link" href="" @click.prevent="currentPage = page-1">{{page}}</a>
+                    </li>
+                </ul>
+            </nav>
+            <!-- <nav aria-label="Page navigation example">
+                <ul>
+                    <li class="page-item" v-for="page in filterData.length">
+                        <a href="" class="page-link">{{page}}</a>
+                    </li>
+                </ul>
+            </nav> -->
+        </div>
     </div>
 
     <script>
@@ -58,7 +67,8 @@
                 data: [],
                 locations: [],
                 tpPark: [],
-                current: 'dddd'
+                current: '',
+                currentPage: 0
             },
             created() {
                 const vm = this;
@@ -96,28 +106,24 @@
             computed: {
                 filterData() {
                     const vm = this;
-                    console.log(vm.current);
                     let items = [];
-                    if (vm.currentLocation) {
+                    if (vm.current != '') {
                         items = vm.tpPark.filter((item, i) => {
-                            // console.log(item);
+                            return item.area == vm.current;
                         });
                     } else {
                         items = vm.tpPark;
                     }
-                    // vm.tpPark.filter((item, i) => {
-                    //     return item.name == vm.locations;
-                    // });
-                    // return vm.tpPark;
+
                     const newData = [];
-                    vm.tpPark.forEach((item, i) => {
-                        if (i % 10 == 0) {
+                    items.forEach((item, i) => {
+                        if (i % 100 === 0) {
                             newData.push([]);
                         }
-                        const page = parseInt(i / 10);
+                        const page = parseInt(i / 100);
                         newData[page].push(item);
                     })
-                    return vm.tpPark;
+                    return newData;
                 }
             }
         })
